@@ -25,8 +25,12 @@ theme, full player on the left and mini player on the right.
 
 ## Install
 
-You need [Omarchy](https://omarchy.org) 4, a Pandora account, **pithos**, and
-**cava** (the Now Playing visualizer).
+You need [Omarchy](https://omarchy.org) 4, a Pandora account, and two programs:
+
+- [**Pithos**](https://github.com/pithos/pithos) ([website](https://pithos.github.io/)):
+  the Pandora player that logs in and plays the music.
+- [**cava**](https://github.com/karlstav/cava): the audio visualizer behind the
+  bouncing bars in Now Playing.
 
 ```bash
 sudo pacman -S --needed pithos cava
