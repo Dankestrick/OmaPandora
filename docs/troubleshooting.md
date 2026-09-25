@@ -17,7 +17,7 @@ omarchy plugin list
 ## Hover still says the old tooltip / UI looks stale
 
 `keepLoaded` services do not always pick up QML until a shell restart. Also
-make sure `~/.config/omarchy/plugins/io.github.dankestrick.omapandora/Panel.qml`
+make sure `~/.config/omarchy/plugins/io.github.dankestrick.omapandora/qml/Panel.qml`
 is **not** zero bytes (that happened during development).
 
 ## Visualizer is still / not bouncing

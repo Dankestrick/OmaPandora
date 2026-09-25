@@ -54,6 +54,9 @@ plugin tree that is a symlink. Full walkthrough: [docs/install.md](docs/install.
 
 Pithos is not started at login. It starts when you open OmaPandora.
 
+If the Pithos window keeps popping up, add the window rule in
+[docs/install.md](docs/install.md#4-optional-window-rules) to keep it out of sight.
+
 ## Use
 
 | Action | What happens |
@@ -127,6 +130,10 @@ o.bind("SUPER + ALT + L", "Pandora thumbs up", "omarchy-shell -q io.github.danke
 | `/` or `Ctrl+F` | Search stations |
 | `Ctrl+/` | Shortcut list |
 | `Esc` | Close the window (music keeps going unless you use **X**) |
+
+## Troubleshooting
+
+Something not working? See [docs/troubleshooting.md](docs/troubleshooting.md).
 
 ## Remove
 
