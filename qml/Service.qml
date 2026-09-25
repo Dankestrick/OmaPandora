@@ -97,15 +97,6 @@ Item {
     if (next && typeof next === "object") settings = next
   }
 
-  function persistSettings(values) {
-    var entry = { id: pluginId }
-    for (var existing in settings) if (existing !== "id") entry[existing] = settings[existing]
-    for (var key in values) entry[key] = values[key]
-    settings = entry
-    if (shell && typeof shell.updateEntryInline === "function")
-      shell.updateEntryInline(pluginId, entry)
-  }
-
   function findPithosPlayer() {
     for (var i = 0; i < players.length; i++) {
       var player = players[i]
