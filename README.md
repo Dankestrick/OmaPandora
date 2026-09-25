@@ -184,6 +184,14 @@ omarchy restart shell
 
 Where new files belong: [LAYOUT.md](LAYOUT.md). More guides: [docs/README.md](docs/README.md).
 
+## Credits
+
+OmaPandora is built on [OmaSpotify](https://github.com/jeremylanger/omaspotify).
+Its players, controls, and bar widget were the starting point and a big
+inspiration for this project. Thanks to the OmaSpotify contributors for their
+great work.
+
 ## License
 
-[MIT](LICENSE) © 2026 Dankestrick
+[MIT](LICENSE) © 2026 Dankestrick. Includes code from
+[OmaSpotify](https://github.com/jeremylanger/omaspotify), MIT © 2026 OmaSpotify contributors.
