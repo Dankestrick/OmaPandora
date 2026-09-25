@@ -1,0 +1,326 @@
+#!/usr/bin/env python3
+"""Talk to a running Pithos player over MPRIS. Prints JSON."""
+
+import json
+import os
+import shutil
+import subprocess
+import sys
+
+from gi.repository import Gio, GLib
+
+BUS_CANDIDATES = (
+    "org.mpris.MediaPlayer2.io.github.Pithos",
+    "org.mpris.MediaPlayer2.pithos",
+)
+OBJECT = "/org/mpris/MediaPlayer2"
+PLAYER = "org.mpris.MediaPlayer2.Player"
+PLAYLISTS = "org.mpris.MediaPlayer2.Playlists"
+RATINGS = "org.mpris.MediaPlayer2.ExtensionPithosRatings"
+PROPS = "org.freedesktop.DBus.Properties"
+ROOT = "org.mpris.MediaPlayer2"
+
+
+def session_bus():
+    return Gio.bus_get_sync(Gio.BusType.SESSION, None)
+
+
+def list_names(bus):
+    reply = bus.call_sync(
+        "org.freedesktop.DBus",
+        "/org/freedesktop/DBus",
+        "org.freedesktop.DBus",
+        "ListNames",
+        None,
+        GLib.VariantType.new("(as)"),
+        Gio.DBusCallFlags.NONE,
+        2000,
+        None,
+    )
+    return list(reply.unpack()[0])
+
+
+def find_bus_name(bus):
+    names = list_names(bus)
+    for candidate in BUS_CANDIDATES:
+        if candidate in names:
+            return candidate
+    for name in names:
+        lowered = name.lower()
+        if name.startswith("org.mpris.MediaPlayer2.") and "pithos" in lowered:
+            return name
+    return None
+
+
+def call(bus, name, interface, method, params=None, reply_type=None, timeout=4000):
+    return bus.call_sync(
+        name,
+        OBJECT,
+        interface,
+        method,
+        params,
+        reply_type,
+        Gio.DBusCallFlags.NONE,
+        timeout,
+        None,
+    )
+
+
+def get_all(bus, name, interface):
+    reply = call(
+        bus,
+        name,
+        PROPS,
+        "GetAll",
+        GLib.Variant("(s)", (interface,)),
+        GLib.VariantType.new("(a{sv})"),
+    )
+    return dict(reply.unpack()[0])
+
+
+def unpack_maybe(value):
+    if isinstance(value, GLib.Variant):
+        return unpack_maybe(value.unpack())
+    if isinstance(value, (list, tuple)):
+        return [unpack_maybe(item) for item in value]
+    return value
+
+
+def metadata_map(raw):
+    if not isinstance(raw, dict):
+        return {}
+    out = {}
+    for key, value in raw.items():
+        out[str(key)] = unpack_maybe(value)
+    return out
+
+
+def first_artist(meta):
+    artists = meta.get("xesam:artist") or []
+    if isinstance(artists, str):
+        return artists
+    if artists:
+        return str(artists[0])
+    return ""
+
+
+def station_id_from_path(path):
+    marker = "/io/github/Pithos/PlaylistId/"
+    text = str(path or "")
+    if text.startswith(marker):
+        return text[len(marker) :]
+    return text.strip("/")
+
+
+def dump_status(bus, name):
+    player = get_all(bus, name, PLAYER)
+    root = get_all(bus, name, ROOT)
+    playlists = {}
+    try:
+        playlists = get_all(bus, name, PLAYLISTS)
+    except GLib.Error:
+        playlists = {}
+
+    meta = metadata_map(player.get("Metadata") or {})
+    active = playlists.get("ActivePlaylist")
+    station_path = ""
+    station_name = ""
+    if isinstance(active, (list, tuple)) and len(active) == 2:
+        valid, playlist = active
+        if valid and isinstance(playlist, (list, tuple)) and playlist:
+            station_path = str(playlist[0] or "")
+            station_name = str(playlist[1] or "") if len(playlist) > 1 else ""
+
+    stations = []
+    try:
+        reply = call(
+            bus,
+            name,
+            PLAYLISTS,
+            "GetPlaylists",
+            GLib.Variant("(uusb)", (0, 200, "Alphabetical", False)),
+            GLib.VariantType.new("(a(oss))"),
+        )
+        for path, title, _icon in reply.unpack()[0]:
+            stations.append(
+                {
+                    "id": station_id_from_path(path),
+                    "path": str(path),
+                    "name": str(title),
+                }
+            )
+    except GLib.Error:
+        stations = []
+
+    rating = float(meta.get("xesam:userRating") or 0)
+    length_us = int(meta.get("mpris:length") or 0)
+    position_us = int(player.get("Position") or 0)
+    return {
+        "connected": True,
+        "bus": name,
+        "identity": str(root.get("Identity") or "Pithos"),
+        "status": str(player.get("PlaybackStatus") or "Stopped"),
+        "title": str(meta.get("xesam:title") or ""),
+        "artist": first_artist(meta),
+        "album": str(meta.get("xesam:album") or ""),
+        "artUrl": str(meta.get("mpris:artUrl") or ""),
+        "trackId": str(meta.get("mpris:trackid") or ""),
+        "loved": rating >= 0.99,
+        "volume": float(player.get("Volume") or 0),
+        "positionMs": int(position_us / 1000),
+        "lengthMs": int(length_us / 1000),
+        "canPlay": bool(player.get("CanPlay")),
+        "canPause": bool(player.get("CanPause")),
+        "canGoNext": bool(player.get("CanGoNext")),
+        "stationPath": station_path,
+        "stationName": station_name,
+        "stations": stations,
+    }
+
+
+def disconnected():
+    return {
+        "connected": False,
+        "bus": "",
+        "identity": "",
+        "status": "Stopped",
+        "title": "",
+        "artist": "",
+        "album": "",
+        "artUrl": "",
+        "trackId": "",
+        "loved": False,
+        "volume": 0,
+        "positionMs": 0,
+        "lengthMs": 0,
+        "canPlay": False,
+        "canPause": False,
+        "canGoNext": False,
+        "stationPath": "",
+        "stationName": "",
+        "stations": [],
+    }
+
+
+def print_json(payload):
+    json.dump(payload, sys.stdout, ensure_ascii=False)
+    sys.stdout.write("\n")
+
+
+def require_track(status):
+    track_id = status.get("trackId") or ""
+    if not track_id or track_id.endswith("NoTrack"):
+        raise SystemExit("no current track")
+    return track_id
+
+
+def launch_pithos():
+    binary = shutil.which("pithos")
+    if not binary:
+        raise SystemExit("pithos is not installed")
+    try:
+        bus = session_bus()
+        if find_bus_name(bus):
+            return {"ok": True, "launched": False, "already": True}
+    except Exception:
+        pass
+    subprocess.Popen(
+        [binary],
+        start_new_session=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        env=os.environ.copy(),
+    )
+    return {"ok": True, "launched": True}
+
+
+def main(argv):
+    command = (argv[1] if len(argv) > 1 else "status").strip().lower()
+    argument = argv[2] if len(argv) > 2 else ""
+
+    if command == "launch":
+        print_json(launch_pithos())
+        return 0
+
+    if command == "pins-save":
+        pin_path = os.path.expanduser("~/.config/omarchy/omapandora-pins.json")
+        os.makedirs(os.path.dirname(pin_path), exist_ok=True)
+        with open(pin_path, "w", encoding="utf-8") as handle:
+            handle.write(argument or "[]")
+            handle.write("\n")
+        print_json({"ok": True, "command": "pins-save"})
+        return 0
+
+    bus = session_bus()
+    name = find_bus_name(bus)
+    if not name:
+        if command == "status":
+            print_json(disconnected())
+            return 0
+        raise SystemExit("pithos is not running")
+
+    if command == "status":
+        print_json(dump_status(bus, name))
+        return 0
+
+    if command == "playpause":
+        call(bus, name, PLAYER, "PlayPause")
+    elif command == "play":
+        call(bus, name, PLAYER, "Play")
+    elif command == "pause":
+        call(bus, name, PLAYER, "Pause")
+    elif command == "next":
+        call(bus, name, PLAYER, "Next")
+    elif command == "raise":
+        call(bus, name, ROOT, "Raise")
+    elif command == "quit":
+        try:
+            call(bus, name, PLAYER, "Pause")
+        except Exception:
+            pass
+        try:
+            call(bus, name, ROOT, "Quit")
+        except Exception:
+            pass
+        subprocess.run(["pkill", "-x", "pithos"], check=False,
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    elif command == "station":
+        if not argument:
+            raise SystemExit("station path required")
+        call(bus, name, PLAYLISTS, "ActivatePlaylist", GLib.Variant("(o)", (argument,)))
+    elif command in ("love", "ban", "tired", "unrate"):
+        status = dump_status(bus, name)
+        track_id = require_track(status)
+        method = {
+            "love": "LoveSong",
+            "ban": "BanSong",
+            "tired": "TiredSong",
+            "unrate": "UnRateSong",
+        }[command]
+        call(bus, name, RATINGS, method, GLib.Variant("(o)", (track_id,)))
+    elif command == "volume":
+        if argument == "":
+            raise SystemExit("volume 0-1 required")
+        volume = max(0.0, min(1.0, float(argument)))
+        call(
+            bus,
+            name,
+            PROPS,
+            "Set",
+            GLib.Variant("(ssv)", (PLAYER, "Volume", GLib.Variant("d", volume))),
+        )
+    else:
+        raise SystemExit(f"unknown command: {command}")
+
+    print_json({"ok": True, "command": command})
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        raise SystemExit(main(sys.argv))
+    except SystemExit:
+        raise
+    except Exception as error:
+        sys.stderr.write(str(error) + "\n")
+        raise SystemExit(1)

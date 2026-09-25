@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.dankestrick.omapandora",
+  "name": "OmaPandora",
+  "version": "0.1.0",
+  "author": "Dankestrick",
+  "license": "MIT",
+  "description": "Pandora in Quickshell for Omarchy. Looks like OmaSpotify, plays through Pithos, and follows your theme.",
+  "dependencies": [
+    {
+      "name": "pithos",
+      "package": "pithos",
+      "why": "Pandora login and playback daemon"
+    },
+    {
+      "name": "cava",
+      "package": "cava",
+      "why": "Now playing audio visualizer"
+    }
+  ],
+  "kinds": [
+    "service",
+    "bar-widget",
+    "panel"
+  ],
+  "keepLoaded": true,
+  "entryPoints": {
+    "service": "qml/Service.qml",
+    "barWidget": "qml/BarWidget.qml",
+    "panel": "qml/Panel.qml"
+  },
+  "barWidget": {
+    "displayName": "Pandora",
+    "description": "Pandora mini player and station browser, themed for Omarchy.",
+    "category": "Media",
+    "aliases": [
+      "pandora",
+      "pithos",
+      "music",
+      "radio"
+    ],
+    "allowMultiple": false,
+    "defaultSection": "left",
+    "defaults": {
+      "showMiniPlayer": "On",
+      "showTrackTitle": "On",
+      "showArtistName": "Off",
+      "showPausedTrack": "On",
+      "scrollBarText": "Off",
+      "maxBarTextWidth": "240"
+    },
+    "schema": [
+      {
+        "key": "showMiniPlayer",
+        "type": "enum",
+        "label": "Open mini-player from bar",
+        "options": ["On", "Off"],
+        "defaultValue": "On",
+        "description": "When off, clicking the bar icon opens the full player."
+      },
+      {
+        "key": "showTrackTitle",
+        "type": "enum",
+        "label": "Show track title in bar",
+        "options": ["On", "Off"],
+        "defaultValue": "On"
+      },
+      {
+        "key": "showArtistName",
+        "type": "enum",
+        "label": "Show artist name in bar",
+        "options": ["On", "Off"],
+        "defaultValue": "Off"
+      },
+      {
+        "key": "showPausedTrack",
+        "type": "enum",
+        "label": "Show paused track in bar",
+        "options": ["On", "Off"],
+        "defaultValue": "On"
+      },
+      {
+        "key": "scrollBarText",
+        "type": "enum",
+        "label": "Scroll long bar text",
+        "options": ["On", "Off"],
+        "defaultValue": "Off"
+      },
+      {
+        "key": "maxBarTextWidth",
+        "type": "string",
+        "label": "Maximum bar text width",
+        "defaultValue": "240",
+        "description": "Width from 160 to 560 px. Use 0 for unlimited."
+      }
+    ]
+  }
+}

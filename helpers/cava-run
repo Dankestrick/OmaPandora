@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# Capture the default speaker monitor, not the microphone.
+set -euo pipefail
+
+sink="$(pactl get-default-sink 2>/dev/null || true)"
+monitor="auto"
+if [[ -n "$sink" ]]; then
+  monitor="${sink}.monitor"
+  export PULSE_SOURCE="$monitor"
+fi
+
+conf="$(mktemp /tmp/omapandora-cava.XXXXXX.conf)"
+trap 'rm -f "$conf"' EXIT
+
+cat >"$conf" <<EOF
+[general]
+framerate = 60
+bars = 56
+autosens = 1
+sensitivity = 160
+lower_cutoff_freq = 30
+higher_cutoff_freq = 14000
+
+[input]
+method = pulse
+source = ${monitor}
+
+[output]
+method = raw
+raw_target = /dev/stdout
+data_format = ascii
+ascii_max_range = 100
+channels = mono
+reverse = 0
+
+[smoothing]
+monstercat = 0
+waves = 0
+gravity = 80
+noise_reduction = 22
+EOF
+
+exec stdbuf -oL cava -p "$conf"

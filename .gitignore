@@ -1,0 +1,16 @@
+# QML / Python
+*.qmlc
+__pycache__/
+*.pyc
+*.pyo
+
+# Editors / OS
+.DS_Store
+*~
+*.swp
+.idea/
+.vscode/
+
+# Local only
+/build/
+*.log
