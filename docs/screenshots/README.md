@@ -2,7 +2,8 @@
 
 Drop PNG (or JPG) files here. Suggested names:
 
-- `main-window.png` (used in the root README)
+- `Main.png` (used in the root README)
+- `ThemeChange1-4.png` and `MiniTheme1-4.png` (theme table in the root README)
 - `bar-icon.png`
 - `player-now-playing.png`
 - `player-my-list.png`

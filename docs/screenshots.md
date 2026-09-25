@@ -9,7 +9,8 @@ Use PNG. Dark theme and light theme both help if you switch Omarchy themes.
 
 | File | Shot |
 | --- | --- |
-| `main-window.png` | Full floating player (already in the README) |
+| `Main.png` | Full floating player (already in the README) |
+| `ThemeChange1-4.png` / `MiniTheme1-4.png` | Full and mini player in the same four themes (already in the README) |
 | `bar-icon.png` | Omarchy bar with the music-note OmaPandora icon |
 | `player-now-playing.png` | Full floating window, Now Playing header with station name |
 | `player-my-list.png` | Tab group 1: My list frame highlighted, a pin selected |

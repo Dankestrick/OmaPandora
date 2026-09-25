@@ -7,9 +7,21 @@ a floating window for stations and Now Playing. It follows your Omarchy theme.
 Playback goes through [Pithos](https://github.com/pithos/pithos) because
 Pandora has no public hobby OAuth for a bar plugin.
 
-![OmaPandora main window with My list, Your stations, Now Playing, visualizer, and sound bar](docs/screenshots/main-window.png)
+![OmaPandora main window with My list, Your stations, Now Playing, visualizer, and sound bar](docs/screenshots/Main.png)
 
 Plugin id: `io.github.dankestrick.omapandora`
+
+## Themes
+
+Switch your Omarchy theme and both players follow it. Each row is the same
+theme, full player on the left and mini player on the right.
+
+| Full player | Mini player |
+| --- | --- |
+| ![Full player, theme 1](docs/screenshots/ThemeChange1.png) | ![Mini player, theme 1](docs/screenshots/MiniTheme1.png) |
+| ![Full player, theme 2](docs/screenshots/ThemeChange2.png) | ![Mini player, theme 2](docs/screenshots/MiniTheme2.png) |
+| ![Full player, theme 3](docs/screenshots/ThemeChange3.png) | ![Mini player, theme 3](docs/screenshots/MiniTheme3.png) |
+| ![Full player, theme 4](docs/screenshots/ThemeChange4.png) | ![Mini player, theme 4](docs/screenshots/MiniTheme4.png) |
 
 ## Install
 
