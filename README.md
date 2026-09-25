@@ -165,13 +165,14 @@ sudo pacman -Rns pithos cava                    # only if nothing else needs the
 From a git checkout you can also run `./scripts/uninstall.sh`, which calls
 the same `omarchy plugin remove`. Details: [docs/uninstall.md](docs/uninstall.md).
 
-## Develop from this folder
+## Develop from a clone
 
 `scripts/install.sh` copies `manifest.json`, `qml/`, and `helpers/` into the
 live plugin directory. Use it while hacking, not as the public install.
 
 ```bash
-cd ~/GitDank/OmaPandora
+git clone https://github.com/Dankestrick/OmaPandora.git
+cd OmaPandora
 ./scripts/install.sh
 omarchy restart shell
 ./scripts/validate.sh

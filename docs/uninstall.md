@@ -47,5 +47,5 @@ Only do this if nothing else on the machine needs them.
 
 ## 6. Optional: this git checkout
 
-The development copy in `~/GitDank/OmaPandora` is **not** removed by the steps
+Your git clone of OmaPandora is **not** removed by the steps
 above. Delete that folder yourself if you want the source gone too.

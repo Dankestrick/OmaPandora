@@ -43,10 +43,11 @@ omarchy plugin add https://github.com/Dankestrick/OmaPandora.git --enable
 That clones into `~/.config/omarchy/plugins/io.github.dankestrick.omapandora/`
 and puts the widget on the bar.
 
-### From this folder (local development)
+### From a git clone (local development)
 
 ```bash
-cd ~/GitDank/OmaPandora
+git clone https://github.com/Dankestrick/OmaPandora.git
+cd OmaPandora
 ./scripts/install.sh
 omarchy plugin enable io.github.dankestrick.omapandora left
 omarchy restart shell
