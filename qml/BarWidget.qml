@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import qs.Commons
 import qs.Ui
 import "Api.js" as Api
@@ -136,15 +135,6 @@ BarWidget {
 
   function syncSettings() {
     if (pandora) pandora.applySettings(settings)
-  }
-
-  IpcHandler {
-    target: root.moduleName
-    function open() { root.open() }
-    function close() { root.close() }
-    function show() { root.open() }
-    function hide() { root.close() }
-    function toggle() { root.toggle() }
   }
 
   implicitWidth: button.implicitWidth
