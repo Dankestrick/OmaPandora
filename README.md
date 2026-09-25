@@ -1,57 +1,124 @@
 # OmaPandora
 
-**Pandora in Quickshell for [Omarchy](https://omarchy.org) — not a browser tab.**
+**Pandora in the Omarchy bar — not a browser tab.**
 
-OmaPandora is a themed bar plugin and floating player. It looks and feels like
-[OmaSpotify](https://github.com/jeremylanger/omaspotify), but it plays **Pandora**
-through [Pithos](https://github.com/pithos/pithos). Pithos is the login and
-playback dependency. OmaPandora is the Omarchy-themed front end.
-
-- Bar icon (music note) opens a large floating player
-- Stations, pinned **My list**, Now Playing, and a cava visualizer
-- Follows your Omarchy theme
-- Keyboard-first: Tab groups, arrow rolodex, Enter to play
+OmaPandora is a Quickshell plugin: a music-note on the bar, a mini player, and
+a floating window for stations and Now Playing. It follows your Omarchy theme.
+Playback goes through [Pithos](https://github.com/pithos/pithos) because
+Pandora has no public hobby OAuth for a bar plugin.
 
 ![OmaPandora main window with My list, Your stations, Now Playing, visualizer, and sound bar](docs/screenshots/main-window.png)
 
 Plugin id: `io.github.dankestrick.omapandora`
 
-## Quick start
+## Install
+
+You need [Omarchy](https://omarchy.org) 4, a Pandora account, **pithos**, and
+**cava** (the Now Playing visualizer).
 
 ```bash
-# Dependencies
 sudo pacman -S --needed pithos cava
+```
 
-# Install the plugin (after this repo is on GitHub)
+If `pithos` is not in the repos on your snapshot:
+
+```bash
+omarchy pkg aur add pithos
+```
+
+Then add the plugin:
+
+```bash
 omarchy plugin add https://github.com/Dankestrick/OmaPandora.git --enable
 ```
 
-Sign in to Pandora **once** in Pithos. After that, open OmaPandora from the bar.
-Pithos runs in the background while you listen and quits when you hit **X**.
+That clones into `~/.config/omarchy/plugins/io.github.dankestrick.omapandora/`
+and places the widget on the **left** of the bar (after workspaces). To move
+it:
 
-Full walkthrough: [docs/install.md](docs/install.md)
+```bash
+omarchy bar move io.github.dankestrick.omapandora --section left
+```
 
-## Docs
+Do not symlink this git checkout into the plugins folder. Omarchy rejects a
+plugin tree that is a symlink. Full walkthrough: [docs/install.md](docs/install.md).
 
-All guides: [docs/README.md](docs/README.md). Where each source file belongs: [LAYOUT.md](LAYOUT.md).
+## First run
 
-| Doc | What it covers |
+1. Click the music-note on the bar.
+2. If nothing is connected, open **Pithos** from the plugin (Settings / Open
+   Pithos) and sign in with your Pandora account once. The password stays in
+   the desktop keyring.
+3. After that, control everything from OmaPandora. Pithos stays in the
+   background while you listen.
+
+Pithos is not started at login. It starts when you open OmaPandora.
+
+## Use
+
+| Action | What happens |
 | --- | --- |
-| [Install](docs/install.md) | Step by step setup |
-| [Uninstall](docs/uninstall.md) | Remove the plugin and optional packages |
-| [Dependencies](docs/dependencies.md) | Pithos, cava, and why |
-| [First run](docs/first-run.md) | Sign in, play, pin stations |
-| [Keyboard](docs/keyboard.md) | Shortcuts |
-| [Layout](docs/layout.md) | Bar, sidebar, player |
-| [Pithos](docs/pithos.md) | Hidden playback process |
-| [Screenshots](docs/screenshots.md) | What to capture and where to put files |
-| [Troubleshooting](docs/troubleshooting.md) | Common fixes |
-| [Publish](docs/publish.md) | GitHub and marketplace |
+| Left-click the bar icon | Toggle the mini player |
+| Right-click the bar icon | Open the full player |
+| **X** on the player | Stop the song, quit Pithos, close OmaPandora |
+| Bar icon while music is playing | Hide or show the UI; the song keeps going |
 
-License: [MIT](LICENSE)
+The full window has **My list** (pins), **Your stations**, and the big player
+(art, cava visualizer, volume). Pandora has no previous-track or seek.
 
-## Screenshots
+Pinned stations are stored in `~/.config/omarchy/omapandora-pins.json`,
+outside the plugin folder, so updates do not wipe them.
 
-The main player is shown above. Add more shots in
-[`docs/screenshots/`](docs/screenshots/). Names are listed in
-[docs/screenshots.md](docs/screenshots.md).
+## Keyboard
+
+`Ctrl+/` opens the same list inside the player.
+
+| Shortcut | Action |
+| --- | --- |
+| `Tab` / `F6` | My list → Your stations → big player |
+| `↑` / `↓` | Highlight inside the current group (wraps) |
+| `Enter` | Play the highlighted station |
+| `C` | Pin or unpin |
+| `Space` | Play or pause |
+| `Ctrl+Right` | Next song |
+| `Ctrl+Up` / `Ctrl+Down` | Volume |
+| `M` | Mute |
+| `/` or `Ctrl+F` | Search stations |
+| `Ctrl+/` | Shortcut list |
+| `Esc` | Close the window (music keeps going unless you use **X**) |
+
+## Remove
+
+```bash
+omarchy plugin remove io.github.dankestrick.omapandora --yes
+```
+
+That removes the plugin files and the bar widget. It does **not** uninstall
+pithos or cava, and it does **not** delete your pins.
+
+```bash
+rm -f ~/.config/omarchy/omapandora-pins.json   # optional
+pkill -x pithos                                 # if it is still running
+sudo pacman -Rns pithos cava                    # only if nothing else needs them
+```
+
+From a git checkout you can also run `./scripts/uninstall.sh`, which calls
+the same `omarchy plugin remove`. Details: [docs/uninstall.md](docs/uninstall.md).
+
+## Develop from this folder
+
+`scripts/install.sh` copies `manifest.json`, `qml/`, and `helpers/` into the
+live plugin directory. Use it while hacking, not as the public install.
+
+```bash
+cd ~/GitDank/OmaPandora
+./scripts/install.sh
+omarchy restart shell
+./scripts/validate.sh
+```
+
+Where new files belong: [LAYOUT.md](LAYOUT.md). More guides: [docs/README.md](docs/README.md).
+
+## License
+
+[MIT](LICENSE) © 2026 Dankestrick

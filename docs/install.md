@@ -34,7 +34,7 @@ Details: [dependencies.md](dependencies.md)
 
 ## 3. Add the plugin
 
-### From GitHub (once the repo is public)
+### From GitHub
 
 ```bash
 omarchy plugin add https://github.com/Dankestrick/OmaPandora.git --enable
