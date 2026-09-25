@@ -242,15 +242,6 @@ def main(argv):
         print_json(launch_pithos())
         return 0
 
-    if command == "pins-save":
-        pin_path = os.path.expanduser("~/.config/omarchy/omapandora-pins.json")
-        os.makedirs(os.path.dirname(pin_path), exist_ok=True)
-        with open(pin_path, "w", encoding="utf-8") as handle:
-            handle.write(argument or "[]")
-            handle.write("\n")
-        print_json({"ok": True, "command": "pins-save"})
-        return 0
-
     bus = session_bus()
     name = find_bus_name(bus)
     if not name:

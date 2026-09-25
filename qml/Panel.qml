@@ -677,6 +677,7 @@ Item {
 
                     Text {
                       width: parent.width
+                      textFormat: Text.PlainText
                       text: root.service && root.service.title
                         ? root.service.title : "Nothing playing"
                       color: root.foreground
@@ -689,6 +690,7 @@ Item {
                     Text {
                       width: parent.width
                       visible: root.service && root.service.artist !== ""
+                      textFormat: Text.PlainText
                       text: root.service ? root.service.artist : ""
                       color: root.accent
                       font.family: root.fontFamily
@@ -699,6 +701,7 @@ Item {
                     Text {
                       width: parent.width
                       visible: root.service && root.service.album !== ""
+                      textFormat: Text.PlainText
                       text: root.service ? root.service.album : ""
                       color: root.muted
                       font.family: root.fontFamily
@@ -712,6 +715,7 @@ Item {
 
                       Text {
                         width: Math.max(40, parent.width - pinCurrent.width - parent.spacing)
+                        textFormat: Text.PlainText
                         text: root.service ? root.service.stationName : ""
                         color: root.muted
                         font.family: root.fontFamily
@@ -813,6 +817,7 @@ Item {
                         Text {
                           width: Math.max(40, parent.width - Style.space(110))
                           anchors.verticalCenter: parent.verticalCenter
+                          textFormat: Text.PlainText
                           text: modelData.name || "Station"
                           color: root.foreground
                           font.family: root.fontFamily
@@ -869,6 +874,7 @@ Item {
                 Text {
                   width: parent.width
                   visible: root.service && root.service.lastError !== ""
+                  textFormat: Text.PlainText
                   text: root.service ? root.service.lastError : ""
                   color: Color.urgent
                   font.family: root.fontFamily
@@ -953,6 +959,7 @@ Item {
                   spacing: Style.space(3)
                   Text {
                     width: Math.max(20, parent.width - footerLike.width - parent.spacing)
+                    textFormat: Text.PlainText
                     text: root.service && root.service.title
                       ? root.service.title : "Nothing playing"
                     color: root.service && root.service.title ? root.foreground : root.muted
@@ -976,6 +983,7 @@ Item {
 
                 Text {
                   width: parent.width
+                  textFormat: Text.PlainText
                   text: root.service && root.service.artist
                     ? root.service.artist : "Choose a station to play"
                   color: root.service && root.service.artist ? root.accent : root.muted

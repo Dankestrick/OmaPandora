@@ -435,6 +435,7 @@ BarWidget {
 
             Text {
               width: Math.max(20, parent.width - likeButton.width - parent.spacing)
+              textFormat: Text.PlainText
               text: root.pandora && root.pandora.title ? root.pandora.title : "Nothing playing"
               color: root.pandora && root.pandora.title ? root.foreground : root.muted
               font.family: root.bar ? root.bar.fontFamily : Style.font.family
@@ -460,6 +461,7 @@ BarWidget {
           Text {
             width: parent.width
             visible: root.pandora && root.pandora.artist !== ""
+            textFormat: Text.PlainText
             text: root.pandora ? root.pandora.artist : ""
             color: Color.accent
             font.family: root.bar ? root.bar.fontFamily : Style.font.family

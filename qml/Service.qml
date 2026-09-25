@@ -212,7 +212,6 @@ Item {
     pinnedRaw = next
     var payload = JSON.stringify(next)
     pinFile.setText(payload)
-    runHelper(["pins-save", payload])
   }
 
   function launchPithos() {
