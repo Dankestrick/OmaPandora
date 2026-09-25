@@ -14,4 +14,3 @@ The map of the source tree is [LAYOUT.md](../LAYOUT.md) in the repo root.
 | [Pithos](pithos.md) | Hidden playback process |
 | [Screenshots](screenshots.md) | What to capture and filenames |
 | [Troubleshooting](troubleshooting.md) | Common fixes |
-| [Publish](publish.md) | GitHub and Omarchy marketplace |

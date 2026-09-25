@@ -40,7 +40,6 @@ OmaPandora/
 │   ├── pithos.md
 │   ├── screenshots.md
 │   ├── troubleshooting.md
-│   ├── publish.md         GitHub + marketplace steps for tomorrow.
 │   └── screenshots/       PNG files. kebab-case names, no spaces.
 │
 └── scripts/               Local tools. Not loaded by Omarchy.
