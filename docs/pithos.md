@@ -16,7 +16,9 @@ around: Pithos is a dependency, not a competing UI.
 2. Hyprland can send the Pithos window to `special:pithos` so it stays off
    the regular workspaces.
 3. `pithosctl` uses MPRIS (`PlayPause`, `Next`, playlists, Love/Ban/Tired).
-4. **X** on OmaPandora → pause, `Quit`, `pkill -x pithos`.
+4. **X** on OmaPandora → pause. If OmaPandora started this Pithos, it also
+   sends MPRIS `Quit`, and ends that one process if it is still running a
+   couple of seconds later. A Pithos you opened yourself is only paused.
 
 Pithos is **not** in Hyprland autostart. It should not run 24/7.
 

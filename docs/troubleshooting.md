@@ -38,11 +38,12 @@ skips start if MPRIS is already there. Add the Hyprland rule in
 
 ## X does not stop the music
 
-X should call `stopAndQuit` (pause + MPRIS Quit + `pkill -x pithos`). If Pithos
-is still running:
+X calls `stopAndQuit`, which pauses and then quits Pithos only if OmaPandora
+started it. A Pithos you opened yourself is paused and left running. To close
+it by hand:
 
 ```bash
-pkill -x pithos
+pkill -f /usr/bin/pithos
 ```
 
 ## Pins do not save

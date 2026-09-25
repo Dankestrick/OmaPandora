@@ -4,8 +4,10 @@
 import json
 import os
 import shutil
+import signal
 import subprocess
 import sys
+import time
 
 from gi.repository import Gio, GLib
 
@@ -19,6 +21,11 @@ PLAYLISTS = "org.mpris.MediaPlayer2.Playlists"
 RATINGS = "org.mpris.MediaPlayer2.ExtensionPithosRatings"
 PROPS = "org.freedesktop.DBus.Properties"
 ROOT = "org.mpris.MediaPlayer2"
+PID_FILE = os.path.join(
+    os.environ.get("XDG_RUNTIME_DIR") or f"/tmp/omapandora-{os.getuid()}",
+    "omapandora",
+    "pithos.pid",
+)
 
 
 def session_bus():
@@ -224,14 +231,100 @@ def launch_pithos():
             return {"ok": True, "launched": False, "already": True}
     except Exception:
         pass
-    subprocess.Popen(
+    child = subprocess.Popen(
         [binary],
         start_new_session=True,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
         env=os.environ.copy(),
     )
+    remember_launched(child.pid)
     return {"ok": True, "launched": True}
+
+
+def remember_launched(pid):
+    try:
+        os.makedirs(os.path.dirname(PID_FILE), mode=0o700, exist_ok=True)
+        with open(PID_FILE, "w") as handle:
+            handle.write(f"{pid}\n")
+    except OSError:
+        pass
+
+
+def forget_launched():
+    try:
+        os.remove(PID_FILE)
+    except OSError:
+        pass
+
+
+def is_pithos(pid):
+    try:
+        with open(f"/proc/{pid}/cmdline", "rb") as handle:
+            args = handle.read().split(b"\0")
+    except OSError:
+        return False
+    return any(os.path.basename(arg) == b"pithos" for arg in args[:2])
+
+
+def launched_pid():
+    """PID of the Pithos this plugin started, if it is still that process."""
+    try:
+        with open(PID_FILE) as handle:
+            pid = int(handle.read().strip())
+    except (OSError, ValueError):
+        return None
+    if not is_pithos(pid):
+        forget_launched()
+        return None
+    return pid
+
+
+def bus_owner_pid(bus, name):
+    try:
+        reply = bus.call_sync(
+            "org.freedesktop.DBus",
+            "/org/freedesktop/DBus",
+            "org.freedesktop.DBus",
+            "GetConnectionUnixProcessID",
+            GLib.Variant("(s)", (name,)),
+            GLib.VariantType.new("(u)"),
+            Gio.DBusCallFlags.NONE,
+            2000,
+            None,
+        )
+        return reply.unpack()[0]
+    except Exception:
+        return None
+
+
+def quit_launched(bus, name):
+    """Pause, then quit Pithos only if this plugin started it.
+
+    A Pithos the user opened on their own is paused and left running.
+    """
+    try:
+        call(bus, name, PLAYER, "Pause")
+    except Exception:
+        pass
+    pid = launched_pid()
+    if pid is None or bus_owner_pid(bus, name) != pid:
+        return {"ok": True, "quit": False}
+    try:
+        call(bus, name, ROOT, "Quit")
+    except Exception:
+        pass
+    for _ in range(20):
+        if not is_pithos(pid):
+            break
+        time.sleep(0.1)
+    else:
+        try:
+            os.kill(pid, signal.SIGTERM)
+        except OSError:
+            pass
+    forget_launched()
+    return {"ok": True, "quit": True}
 
 
 def main(argv):
@@ -265,16 +358,8 @@ def main(argv):
     elif command == "raise":
         call(bus, name, ROOT, "Raise")
     elif command == "quit":
-        try:
-            call(bus, name, PLAYER, "Pause")
-        except Exception:
-            pass
-        try:
-            call(bus, name, ROOT, "Quit")
-        except Exception:
-            pass
-        subprocess.run(["pkill", "-x", "pithos"], check=False,
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        print_json(quit_launched(bus, name))
+        return 0
     elif command == "station":
         if not argument:
             raise SystemExit("station path required")

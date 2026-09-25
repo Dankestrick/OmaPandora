@@ -79,7 +79,7 @@ If the Pithos window keeps popping up, add the window rule in
 | Right-click the bar icon | Open the full player |
 | Middle-click the bar icon | Play or pause |
 | Scroll down on the bar icon | Next song |
-| **X** on the player | Stop the song, quit Pithos, close OmaPandora |
+| **X** on the player | Stop the song and close OmaPandora (quits Pithos only if OmaPandora started it) |
 | Bar icon while music is playing | Hide or show the UI; the song keeps going |
 
 The full player opens on the monitor your mouse is on.
@@ -160,7 +160,7 @@ pithos or cava, and it does **not** delete your pins.
 
 ```bash
 rm -f ~/.config/omarchy/omapandora-pins.json   # optional
-pkill -x pithos                                 # if it is still running
+pkill -f /usr/bin/pithos                        # if it is still running
 omarchy pkg drop pithos cava                    # only if nothing else needs them
 ```
 

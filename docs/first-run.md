@@ -14,7 +14,8 @@ You should only need the Pithos window for that first login.
 - **Space** — play / pause (Tab to the big player so the bright border shows
   you are on that group)
 - **Ctrl+Right** — skip
-- **X** (window corner) — stop music, quit Pithos, close OmaPandora
+- **X** (window corner) — stop music and close OmaPandora; quits Pithos only
+  if OmaPandora started it, so a Pithos you opened yourself keeps running
 - Bar icon again — hide / show the player; music keeps going
 
 Pithos is not started at login. It starts when you open OmaPandora and exits

@@ -29,7 +29,7 @@ rm -f ~/.config/omarchy/omapandora-pins.json
 ## 3. Stop Pithos if it is still running
 
 ```bash
-pkill -x pithos
+pkill -f /usr/bin/pithos
 ```
 
 ## 4. Optional: window rules

@@ -6,4 +6,4 @@ omarchy plugin remove io.github.dankestrick.omapandora --yes 2>/dev/null \
 echo "Plugin removed."
 echo "Pins still in ~/.config/omarchy/omapandora-pins.json"
 echo "To drop pins: rm -f ~/.config/omarchy/omapandora-pins.json"
-echo "To stop Pithos if it is still running: pkill -x pithos"
+echo "To stop Pithos if it is still running: pkill -f /usr/bin/pithos"
