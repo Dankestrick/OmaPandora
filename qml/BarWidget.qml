@@ -243,10 +243,12 @@ BarWidget {
         root.openFullPanel()
       } else root.toggle()
     }
-    onWheelMoved: function(delta) {
-      if (!root.pandora) return
-      if (delta < 0) root.pandora.next()
-    }
+    onWheelMoved: function(delta) { root.wheelNext(delta) }
+  }
+
+  function wheelNext(delta) {
+    if (!root.pandora) return
+    if (delta < 0) root.pandora.next()
   }
 
   KeyboardPanel {
@@ -257,6 +259,37 @@ BarWidget {
     open: root.popupOpen
     contentWidth: fittedContentWidth(Style.space(380))
     contentHeight: fittedContentHeight(contentColumn.implicitHeight, Style.space(560))
+
+    // The mini player is a full-screen overlay that forwards bar clicks but
+    // not scrolls, so catch wheel over the bar icon here while it is open.
+    // Children land inside the card, so move this to the overlay's root.
+    Item {
+      id: barWheelCatcher
+      z: -1
+      width: popup.screenW
+      height: popup.screenH
+      Component.onCompleted: Qt.callLater(function() {
+        var p = barWheelCatcher.parent
+        while (p && p.parent) p = p.parent
+        if (p) barWheelCatcher.parent = p
+      })
+
+      WheelHandler {
+        id: barWheel
+        enabled: root.popupOpen
+        onWheel: function(event) {
+          if (event.angleDelta.y === 0) return
+          var pos = barWheel.point.position
+          var x = pos.x, y = pos.y
+          if (popup.barPos === "bottom") y -= popup.screenH - popup.barH
+          else if (popup.barPos === "right") x -= popup.screenW - popup.barW
+          var a = popup.anchorScreenPos
+          if (x >= a.x && x <= a.x + popup.anchorW
+              && y >= a.y && y <= a.y + popup.anchorH)
+            root.wheelNext(event.angleDelta.y)
+        }
+      }
+    }
 
     Column {
       id: contentColumn
