@@ -12,14 +12,12 @@ Declared in `manifest.json` as well.
 ## Install
 
 ```bash
-sudo pacman -S --needed pithos cava
-```
-
-If `pithos` is AUR-only on your snapshot:
-
-```bash
+omarchy pkg add cava
 omarchy pkg aur add pithos
 ```
+
+Pithos is only in the AUR, not the official Arch repos, so it installs with
+`omarchy pkg aur add`. Both commands skip anything already installed.
 
 ## Runtime extras (usually already installed)
 

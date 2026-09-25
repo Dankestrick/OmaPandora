@@ -40,7 +40,7 @@ those `o.window(...)` blocks and run `hyprctl reload`.
 ## 5. Optional: packages
 
 ```bash
-sudo pacman -Rns pithos cava
+omarchy pkg drop pithos cava
 ```
 
 Only do this if nothing else on the machine needs them.

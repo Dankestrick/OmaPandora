@@ -33,14 +33,12 @@ You need [Omarchy](https://omarchy.org) 4, a Pandora account, and two programs:
   bouncing bars in Now Playing.
 
 ```bash
-sudo pacman -S --needed pithos cava
-```
-
-If `pithos` is not in the repos on your snapshot:
-
-```bash
+omarchy pkg add cava
 omarchy pkg aur add pithos
 ```
+
+Pithos is only in the AUR, not the official Arch repos, so it installs with
+`omarchy pkg aur add`. Both commands skip anything already installed.
 
 Then add the plugin:
 
@@ -163,7 +161,7 @@ pithos or cava, and it does **not** delete your pins.
 ```bash
 rm -f ~/.config/omarchy/omapandora-pins.json   # optional
 pkill -x pithos                                 # if it is still running
-sudo pacman -Rns pithos cava                    # only if nothing else needs them
+omarchy pkg drop pithos cava                    # only if nothing else needs them
 ```
 
 From a git checkout you can also run `./scripts/uninstall.sh`, which calls

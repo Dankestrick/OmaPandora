@@ -14,14 +14,12 @@ omarchy plugin list
 ## 2. Dependencies
 
 ```bash
-sudo pacman -S --needed pithos cava
-```
-
-Pithos may come from the AUR on some setups:
-
-```bash
+omarchy pkg add cava
 omarchy pkg aur add pithos
 ```
+
+Pithos is only in the AUR, not the official Arch repos, so it installs with
+`omarchy pkg aur add`. Both commands skip anything already installed.
 
 Confirm:
 
