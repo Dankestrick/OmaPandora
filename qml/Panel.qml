@@ -21,7 +21,6 @@ Item {
   property string browseTarget: "nowplaying"
   property string focusRegion: "nowplaying"
   property bool shortcutHelpOpen: false
-  property bool shortcutHints: true
 
   readonly property string pluginId: manifest && manifest.id
     ? String(manifest.id) : "io.github.dankestrick.omapandora"
@@ -309,9 +308,6 @@ Item {
 
         if (ctrl && event.key === Qt.Key_Slash) {
           root.shortcutHelpOpen = true
-          event.accepted = true
-        } else if (ctrl && event.key === Qt.Key_H) {
-          root.shortcutHints = !root.shortcutHints
           event.accepted = true
         } else if (ctrl && event.key === Qt.Key_F) {
           root.focusSearch()
@@ -1151,7 +1147,6 @@ Item {
                 "Ctrl+Up / Ctrl+Down — Volume",
                 "M — Mute or restore volume",
                 "Ctrl+/ — This list",
-                "Ctrl+H — Hide shortcut hints",
                 "Esc — Close the player"
               ]
               Text {

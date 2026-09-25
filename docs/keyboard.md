@@ -14,7 +14,6 @@
 | `M` | Mute or restore volume |
 | `/` or `Ctrl+F` | Search stations |
 | `Ctrl+/` | Shortcut list |
-| `Ctrl+H` | Hide shortcut hints |
 | `Esc` | Close the player window (music keeps going unless you use **X**) |
 
 ## Tab groups
