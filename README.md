@@ -58,16 +58,57 @@ Pithos is not started at login. It starts when you open OmaPandora.
 
 | Action | What happens |
 | --- | --- |
-| Left-click the bar icon | Toggle the mini player |
+| Left-click the bar icon | Toggle the mini player (or the full player if the mini player is turned off) |
 | Right-click the bar icon | Open the full player |
+| Middle-click the bar icon | Play or pause |
+| Scroll down on the bar icon | Next song |
 | **X** on the player | Stop the song, quit Pithos, close OmaPandora |
 | Bar icon while music is playing | Hide or show the UI; the song keeps going |
+
+The full player opens on the monitor your mouse is on.
 
 The full window has **My list** (pins), **Your stations**, and the big player
 (art, cava visualizer, volume). Pandora has no previous-track or seek.
 
 Pinned stations are stored in `~/.config/omarchy/omapandora-pins.json`,
 outside the plugin folder, so updates do not wipe them.
+
+## Bar settings
+
+| Setting | Key | Default | What it does |
+| --- | --- | --- | --- |
+| Open mini-player from bar | `showMiniPlayer` | On | Off makes left-click open the full player |
+| Show track title in bar | `showTrackTitle` | On | Song title next to the icon |
+| Show artist name in bar | `showArtistName` | Off | Artist next to the title |
+| Show paused track in bar | `showPausedTrack` | On | Keep the title up while paused |
+| Scroll long bar text | `scrollBarText` | Off | Scroll titles that do not fit |
+| Maximum bar text width | `maxBarTextWidth` | 240 | 160 to 560 px, or 0 for unlimited |
+
+Change one from a terminal:
+
+```bash
+omarchy bar set io.github.dankestrick.omapandora showArtistName On
+```
+
+## Keybinds
+
+OmaPandora answers these commands from anywhere, so you can bind them to keys:
+
+```bash
+omarchy-shell io.github.dankestrick.omapandora.player playPause
+omarchy-shell io.github.dankestrick.omapandora.player next
+omarchy-shell io.github.dankestrick.omapandora.player love              # thumbs up, or undo it
+omarchy-shell io.github.dankestrick.omapandora.player toggleMiniPlayer
+omarchy-shell io.github.dankestrick.omapandora.player toggleFullPlayer
+```
+
+Example for `~/.config/hypr/bindings.lua` (pick any keys that are free):
+
+```lua
+o.bind("SUPER + ALT + P", "Pandora play/pause", "omarchy-shell -q io.github.dankestrick.omapandora.player playPause")
+o.bind("SUPER + ALT + N", "Pandora next song", "omarchy-shell -q io.github.dankestrick.omapandora.player next")
+o.bind("SUPER + ALT + L", "Pandora thumbs up", "omarchy-shell -q io.github.dankestrick.omapandora.player love")
+```
 
 ## Keyboard
 
