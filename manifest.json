@@ -5,7 +5,7 @@
   "version": "0.1.1",
   "author": "Dankestrick",
   "license": "MIT",
-  "description": "Pandora in Quickshell for Omarchy. Looks like OmaSpotify, plays through Pithos, and follows your theme.",
+  "description": "Pandora for the Omarchy bar: a mini player and full player that play through Pithos and follow your theme.",
   "dependencies": [
     {
       "name": "pithos",
