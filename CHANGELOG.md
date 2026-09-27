@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Fixed: the full player could get stuck open but treated as closed (no big
+  album art, flat visualizer, Esc not closing, the bar icon opening the mini
+  player on top). Moving the window to another monitor briefly hides it, and
+  that hide was taken as a close. The window now moves only when it is on the
+  wrong monitor, and a hide during the move no longer closes the player.
 - `scripts/install.sh` only replaces a plugin folder it created itself. It no
   longer writes into or deletes files from an `omarchy plugin add` checkout or
   any other folder at the plugin path.

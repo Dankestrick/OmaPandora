@@ -21,6 +21,9 @@ Item {
   property string browseTarget: "nowplaying"
   property string focusRegion: "nowplaying"
   property bool shortcutHelpOpen: false
+  // True while the window is being moved to another monitor. Quickshell
+  // hides and re-shows the window for that; the hide is not a close.
+  property bool movingScreen: false
 
   readonly property string pluginId: manifest && manifest.id
     ? String(manifest.id) : "io.github.dankestrick.omapandora"
@@ -50,7 +53,10 @@ Item {
     if (!service || typeof service.screenByName !== "function") return
     var name = service.preferredScreenName || service.focusedScreenName()
     var scr = service.screenByName(name)
-    if (scr) window.screen = scr
+    if (!scr || (window.screen && window.screen.name === scr.name)) return
+    movingScreen = true
+    window.screen = scr
+    screenMoveSettle.restart()
   }
 
   function open(payloadJson) {
@@ -275,6 +281,15 @@ Item {
     }
   }
 
+  Timer {
+    id: screenMoveSettle
+    interval: 400
+    onTriggered: {
+      root.movingScreen = false
+      if (root.opened && !window.visible) window.visible = true
+    }
+  }
+
   FloatingWindow {
     id: window
     visible: root.opened
@@ -285,7 +300,7 @@ Item {
     minimumSize: Qt.size(1100, 700)
 
     onVisibleChanged: {
-      if (!visible && root.opened && !root.closingFromHost)
+      if (!visible && root.opened && !root.closingFromHost && !root.movingScreen)
         root.requestClose()
     }
 
