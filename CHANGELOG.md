@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- `scripts/install.sh` only replaces a plugin folder it created itself. It no
+  longer writes into or deletes files from an `omarchy plugin add` checkout or
+  any other folder at the plugin path.
+
 ## 0.1.1
 
 - The full player opens on the monitor your mouse is on, not always workspace 3.

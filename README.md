@@ -170,7 +170,11 @@ the same `omarchy plugin remove`. Details: [docs/uninstall.md](docs/uninstall.md
 ## Development
 
 `scripts/install.sh` copies `manifest.json`, `qml/`, and `helpers/` into the
-live plugin directory. Use it while hacking, not as the public install.
+live plugin directory. Use it while hacking, not as the public install. It only
+replaces a folder it created itself (marked by `.omapandora-dev-install`). If
+the plugin was installed with `omarchy plugin add`, or the folder is anything
+else, it stops without changing it; run
+`omarchy plugin remove io.github.dankestrick.omapandora` first.
 
 ```bash
 git clone https://github.com/Dankestrick/OmaPandora.git
