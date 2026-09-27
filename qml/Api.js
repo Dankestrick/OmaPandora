@@ -57,6 +57,19 @@ function parsePinnedStations(raw) {
   }
 }
 
+// Like parsePinnedStations, but returns null when the text is not a JSON
+// array, so a damaged pins file can be told apart from an empty one.
+function readPinnedStations(raw) {
+  var text = String(raw || "").trim()
+  if (!text) return []
+  try {
+    var parsed = JSON.parse(text)
+    return parsed instanceof Array ? parsed : null
+  } catch (error) {
+    return null
+  }
+}
+
 function stationPath(item) {
   if (!item) return ""
   if (typeof item === "string") return item

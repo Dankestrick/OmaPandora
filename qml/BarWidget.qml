@@ -401,7 +401,7 @@ BarWidget {
           color: Style.normalFillFor(root.foreground, Color.accent)
           borderSpec: Border.controlSpec("normal", root.foreground, Color.accent)
 
-          RetryImage {
+          ArtImage {
             id: miniArt
             anchors.fill: parent
             anchors.margins: Style.space(3)

@@ -3,10 +3,10 @@
 
 import json
 import os
-import shutil
 import signal
 import subprocess
 import sys
+import tempfile
 import time
 
 from gi.repository import Gio, GLib
@@ -27,6 +27,12 @@ PID_FILE = os.path.join(
     "omapandora",
     "pithos.pid",
 )
+# The AUR package installs Pithos here. Use this path rather than searching
+# $PATH, so a different "pithos" earlier in $PATH is never started.
+PITHOS_BINARY = "/usr/bin/pithos"
+# Same path the QML reads (Service.qml pinFile).
+PINS_FILE = os.path.join(os.path.expanduser("~"), ".config", "omarchy", "omapandora-pins.json")
+MAX_PINS_BYTES = 256 * 1024
 
 
 def session_bus():
@@ -234,8 +240,8 @@ def require_track(status):
 
 
 def launch_pithos():
-    binary = shutil.which("pithos")
-    if not binary:
+    binary = PITHOS_BINARY
+    if not os.access(binary, os.X_OK):
         raise SystemExit("pithos is not installed")
     try:
         bus = session_bus()
@@ -243,6 +249,10 @@ def launch_pithos():
             return {"ok": True, "launched": False, "already": True}
     except Exception:
         pass
+    # A Pithos this plugin started may still be starting up (not on D-Bus
+    # yet); don't start a second one.
+    if launched_pid() is not None:
+        return {"ok": True, "launched": False, "already": True}
     child = subprocess.Popen(
         [binary],
         start_new_session=True,
@@ -250,6 +260,13 @@ def launch_pithos():
         stderr=subprocess.DEVNULL,
         env=os.environ.copy(),
     )
+    # Pithos allows one instance: a second copy hands off to the running one
+    # and exits at once. Only record a PID that is still running.
+    try:
+        child.wait(timeout=1.5)
+        return {"ok": True, "launched": False, "already": True}
+    except subprocess.TimeoutExpired:
+        pass
     remember_launched(child.pid)
     return {"ok": True, "launched": True}
 
@@ -339,12 +356,58 @@ def quit_launched(bus, name):
     return {"ok": True, "quit": True}
 
 
+def save_pins():
+    """Store the pinned stations (JSON array on stdin) as a private file.
+
+    An existing pins file that can't be read is left alone, so pins the
+    plugin failed to load are never replaced.
+    """
+    raw = sys.stdin.read(MAX_PINS_BYTES + 1)
+    if len(raw) > MAX_PINS_BYTES:
+        raise SystemExit("pin list too large")
+    try:
+        pins = json.loads(raw)
+    except ValueError as error:
+        raise SystemExit(f"pin list is not valid JSON: {error}")
+    if not isinstance(pins, list):
+        raise SystemExit("pin list must be a JSON array")
+    try:
+        with open(PINS_FILE) as handle:
+            text = handle.read(MAX_PINS_BYTES + 1)
+        old = json.loads(text) if text.strip() else []
+    except FileNotFoundError:
+        old = []
+    except (OSError, ValueError):
+        old = None
+    if not isinstance(old, list):
+        raise SystemExit(f"{PINS_FILE} could not be read, so it was not replaced")
+    folder = os.path.dirname(PINS_FILE)
+    os.makedirs(folder, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(prefix=".omapandora-pins-", dir=folder)
+    try:
+        os.fchmod(fd, 0o600)
+        with os.fdopen(fd, "w") as handle:
+            json.dump(pins, handle, ensure_ascii=False)
+        os.replace(tmp, PINS_FILE)
+    except BaseException:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
+    return {"ok": True, "pins": len(pins)}
+
+
 def main(argv):
     command = (argv[1] if len(argv) > 1 else "status").strip().lower()
     argument = argv[2] if len(argv) > 2 else ""
 
     if command == "launch":
         print_json(launch_pithos())
+        return 0
+
+    if command == "pins-save":
+        print_json(save_pins())
         return 0
 
     bus = session_bus()
@@ -407,8 +470,11 @@ def main(argv):
 if __name__ == "__main__":
     try:
         raise SystemExit(main(sys.argv))
-    except SystemExit:
+    except SystemExit as stop:
+        # Error text can quote D-Bus replies from Pithos; keep it short.
+        if isinstance(stop.code, str):
+            raise SystemExit(clip(stop.code))
         raise
     except Exception as error:
-        sys.stderr.write(str(error) + "\n")
+        sys.stderr.write(clip(error) + "\n")
         raise SystemExit(1)

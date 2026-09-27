@@ -22,12 +22,12 @@ OmaPandora/
 │   ├── Visualizer.qml     Cava bars.
 │   ├── TransportButton.qml
 │   ├── PlaybackSlider.qml
-│   └── RetryImage.qml     Album art.
+│   └── ArtImage.qml       Album art (local files from Pithos only).
 │
 ├── helpers/               Programs QML launches. Do not put these in qml/.
 │   ├── pithosctl          Python: MPRIS, launch, quit, pin save.
 │   ├── cava-run           Pulse sink-monitor wrapper for cava.
-│   └── cava.conf          Reference config. cava-run writes its own temp file.
+│   └── cava.conf          Reference config. cava-run pipes its own; no file.
 │
 ├── docs/                  Human guides. Not loaded by Omarchy.
 │   ├── README.md          Index of these guides.

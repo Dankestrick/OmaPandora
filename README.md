@@ -149,6 +149,26 @@ o.bind("SUPER + ALT + L", "Pandora thumbs up", "omarchy-shell -q io.github.danke
 
 Something not working? See [docs/troubleshooting.md](docs/troubleshooting.md).
 
+## Permissions and safety
+
+- No sudo or pkexec is required.
+- No network access of its own. Pithos talks to Pandora and downloads the album
+  art into its own cache; OmaPandora only shows those local files.
+- Programs it runs: Pithos (`/usr/bin/pithos`, only if it isn't already
+  running), cava for the visualizer, and hyprctl to move its own player window
+  to the monitor under the mouse. Every helper and hyprctl run has a time
+  limit.
+- Files it writes: `~/.config/omarchy/omapandora-pins.json` (your pinned
+  stations, private to you, mode 0600) and the Pithos PID file in the
+  owner-only `$XDG_RUNTIME_DIR/omapandora/`. The visualizer's cava config is
+  piped to cava, never written to disk.
+- It stops only the cava it started for its own visualizer. A cava you run
+  yourself keeps running.
+- Close (X) pauses Pandora. It quits Pithos only if OmaPandora started it; a
+  Pithos you opened yourself is only paused.
+- `scripts/install.sh` and `scripts/uninstall.sh` are optional developer
+  scripts; see [Development](#development).
+
 ## Remove
 
 ```bash
@@ -160,7 +180,7 @@ pithos or cava, and it does **not** delete your pins.
 
 ```bash
 rm -f ~/.config/omarchy/omapandora-pins.json   # optional
-gdbus call --session --dest org.mpris.MediaPlayer2.pithos --object-path /org/mpris/MediaPlayer2 --method org.mpris.MediaPlayer2.Quit  # quit Pithos if it is still running
+gdbus call --session --dest org.mpris.MediaPlayer2.io.github.Pithos --object-path /org/mpris/MediaPlayer2 --method org.mpris.MediaPlayer2.Quit  # quit Pithos if it is still running
 omarchy pkg drop pithos cava                    # only if nothing else needs them
 ```
 
@@ -171,9 +191,10 @@ the same `omarchy plugin remove`. Details: [docs/uninstall.md](docs/uninstall.md
 
 `scripts/install.sh` copies `manifest.json`, `qml/`, and `helpers/` into the
 live plugin directory. Use it while hacking, not as the public install. It only
-replaces a folder it created itself (marked by `.omapandora-dev-install`). If
-the plugin was installed with `omarchy plugin add`, or the folder is anything
-else, it stops without changing it; run
+replaces a folder it created itself that still holds exactly what it put there:
+the `.omapandora-dev-install` marker lists each installed file with its SHA-256.
+If the folder has any other file, a changed file, or came from
+`omarchy plugin add`, it stops without changing anything; run
 `omarchy plugin remove io.github.dankestrick.omapandora` first.
 
 ```bash

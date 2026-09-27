@@ -43,7 +43,7 @@ started it. A Pithos you opened yourself is paused and left running. To close
 it by hand:
 
 ```bash
-gdbus call --session --dest org.mpris.MediaPlayer2.pithos --object-path /org/mpris/MediaPlayer2 --method org.mpris.MediaPlayer2.Quit
+gdbus call --session --dest org.mpris.MediaPlayer2.io.github.Pithos --object-path /org/mpris/MediaPlayer2 --method org.mpris.MediaPlayer2.Quit
 ```
 
 ## Pins do not save

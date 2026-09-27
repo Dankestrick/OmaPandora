@@ -424,9 +424,10 @@ Item {
                   Text {
                     textFormat: Text.PlainText
                     width: parent.width
-                    visible: root.pinnedStations.length === 0
-                    text: "Pin a station with C"
-                    color: root.muted
+                    readonly property string pinsError: root.service ? root.service.pinsError : ""
+                    visible: root.pinnedStations.length === 0 || pinsError !== ""
+                    text: pinsError !== "" ? pinsError : "Pin a station with C"
+                    color: pinsError !== "" ? Color.urgent : root.muted
                     font.family: root.fontFamily
                     font.pixelSize: Style.font.caption
                     wrapMode: Text.WordWrap
@@ -654,11 +655,13 @@ Item {
                     color: Style.selectedFillFor(root.foreground, root.accent)
                     borderSpec: Border.controlSpec("normal", root.foreground, root.accent)
 
-                    RetryImage {
+                    ArtImage {
                       id: heroArt
                       anchors.fill: parent
                       anchors.margins: Style.space(4)
                       requestedSource: root.opened && root.service ? root.service.artUrl : ""
+                      sourceSize.width: 512
+                      sourceSize.height: 512
                       fillMode: Image.PreserveAspectFit
                       asynchronous: true
                       cache: true
@@ -933,11 +936,13 @@ Item {
                 color: Style.selectedFillFor(root.foreground, root.accent)
                 borderSpec: Border.controlSpec("normal", root.foreground, root.accent)
 
-                RetryImage {
+                ArtImage {
                   id: footerArtImage
                   anchors.fill: parent
                   anchors.margins: Style.space(2)
                   requestedSource: root.service ? root.service.artUrl : ""
+                  sourceSize.width: 128
+                  sourceSize.height: 128
                   fillMode: Image.PreserveAspectFit
                   asynchronous: true
                   cache: true

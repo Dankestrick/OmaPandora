@@ -54,9 +54,11 @@ omarchy restart shell
 That copies `manifest.json`, `qml/`, and `helpers/` only. Do **not** symlink
 the plugin folder. Omarchy rejects plugin trees that are symlinks.
 
-`install.sh` only replaces a plugin folder it created itself (marked by
-`.omapandora-dev-install`). If you installed from GitHub first, it stops
-without touching that folder. Run
+`install.sh` only replaces a plugin folder it created itself that still holds
+exactly what it put there. The `.omapandora-dev-install` marker lists each
+installed file with its SHA-256. If the folder has a file that is not on that
+list, a listed file was changed, or you installed from GitHub first, it stops
+without touching the folder and lists what it found. Move your files out, or run
 `omarchy plugin remove io.github.dankestrick.omapandora`, then `install.sh`.
 
 ## 4. Optional window rules

@@ -2,19 +2,19 @@
 # Capture the default speaker monitor, not the microphone.
 set -euo pipefail
 
-sink="$(pactl get-default-sink 2>/dev/null || true)"
+sink="$(timeout 3 pactl get-default-sink 2>/dev/null || true)"
 monitor="auto"
 if [[ -n "$sink" ]]; then
   monitor="${sink}.monitor"
   export PULSE_SOURCE="$monitor"
 fi
 
-# Private runtime dir (owner-only), not shared /tmp.
-confdir="${XDG_RUNTIME_DIR:-$HOME/.cache}/omapandora"
-mkdir -p -m 700 "$confdir"
-conf="$(mktemp "$confdir/cava.XXXXXX.conf")"
-
-cat >"$conf" <<EOF
+# The config goes to cava through a pipe, so no file is written: nothing is
+# left behind however the shell stops the visualizer. This cava is started
+# here and is the only one this script (or the shell) ever stops; a cava the
+# user runs elsewhere is never touched.
+config() {
+  cat <<EOF
 [general]
 framerate = 60
 bars = 56
@@ -41,11 +41,6 @@ waves = 0
 gravity = 80
 noise_reduction = 22
 EOF
+}
 
-# Run cava as a child (not exec) so the config file is removed when the
-# visualizer stops, whether cava exits or the shell stops this script.
-stdbuf -oL cava -p "$conf" &
-child=$!
-trap 'kill "$child" 2>/dev/null; rm -f "$conf"' EXIT
-trap 'exit 0' INT TERM HUP
-wait "$child"
+exec stdbuf -oL cava -p <(config)

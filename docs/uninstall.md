@@ -13,10 +13,10 @@ If that command is not available, edit `~/.config/omarchy/shell.json` and
 delete the `io.github.dankestrick.omapandora` entry from `bar.layout` (usually
 under `left`).
 
-## 2. Delete the plugin files
+## 2. Remove the plugin files
 
 ```bash
-rm -rf ~/.config/omarchy/plugins/io.github.dankestrick.omapandora
+omarchy plugin remove io.github.dankestrick.omapandora
 omarchy restart shell
 ```
 
@@ -29,7 +29,7 @@ rm -f ~/.config/omarchy/omapandora-pins.json
 ## 3. Stop Pithos if it is still running
 
 ```bash
-gdbus call --session --dest org.mpris.MediaPlayer2.pithos --object-path /org/mpris/MediaPlayer2 --method org.mpris.MediaPlayer2.Quit
+gdbus call --session --dest org.mpris.MediaPlayer2.io.github.Pithos --object-path /org/mpris/MediaPlayer2 --method org.mpris.MediaPlayer2.Quit
 ```
 
 ## 4. Optional: window rules

@@ -23,6 +23,12 @@ Item {
   property string miniScreenName: ""
   property string preferredScreenName: ""
   property var pinnedRaw: []
+  // Pins are saved only after the pins file was read cleanly or found
+  // missing, so a file that fails to load is never overwritten.
+  property string pinsState: "loading" // "loading", "ok" or "unreadable"
+  readonly property string pinsError: pinsState === "unreadable"
+    ? "Pins are not being saved: ~/.config/omarchy/omapandora-pins.json could not be read. Fix or move that file."
+    : ""
 
   readonly property string pluginId: manifest && manifest.id
     ? String(manifest.id) : "io.github.dankestrick.omapandora"
@@ -189,6 +195,10 @@ Item {
 
   function togglePin(station) {
     if (!station) return
+    if (pinsState !== "ok") {
+      if (pinsError) lastError = pinsError
+      return
+    }
     var path = Api.stationPath(station)
     if (!path) return
     var saved = Api.parsePinnedStations(pinnedRaw)
@@ -215,8 +225,8 @@ Item {
         id: String(station.id || "")
       })
     pinnedRaw = next
-    var payload = JSON.stringify(next)
-    pinFile.setText(payload)
+    pinSaver.input = JSON.stringify(next)
+    if (!pinSaver.running) pinSaver.running = true
   }
 
   function launchPithos() {
@@ -348,7 +358,7 @@ Item {
         var wasConnected = root.connected
         root.status = parsed
         if (parsed.connected) {
-          root.lastError = ""
+          root.lastError = root.pinsError
           if (!wasConnected) root.maybeAutoplay()
         } else if (root.wanted && !root.daemonStartAttempted) {
           root.ensureDaemon()
@@ -395,14 +405,47 @@ Item {
     }
   }
 
+  // Pins are written by the helper as a private (0600) file, sent on stdin.
+  Process {
+    id: pinSaver
+    property string input: ""
+    property string written: ""
+    command: root.helperCommand(10, ["pins-save"])
+    stdinEnabled: true
+    stderr: StdioCollector { id: pinSaverErr; waitForEnd: true }
+    onStarted: {
+      written = input
+      write(input)
+      stdinEnabled = false
+    }
+    onExited: function(code) {
+      stdinEnabled = true
+      if (code !== 0) {
+        root.lastError = String(pinSaverErr.text || "Could not save pins.").trim()
+        return
+      }
+      // Pinned again while this save was running: save the newest list too.
+      if (input !== written) running = true
+    }
+  }
+
   FileView {
     id: pinFile
     path: Quickshell.env("HOME") + "/.config/omarchy/omapandora-pins.json"
     watchChanges: true
-    atomicWrites: true
     printErrors: false
-    onLoaded: root.pinnedRaw = Api.parsePinnedStations(text())
-    onLoadFailed: root.pinnedRaw = []
+    onFileChanged: reload()
+    onLoaded: {
+      var saved = Api.readPinnedStations(text())
+      root.pinnedRaw = saved || []
+      root.pinsState = saved ? "ok" : "unreadable"
+      if (root.pinsError) root.lastError = root.pinsError
+    }
+    onLoadFailed: function(error) {
+      root.pinnedRaw = []
+      root.pinsState = error === FileViewError.FileNotFound ? "ok" : "unreadable"
+      if (root.pinsError) root.lastError = root.pinsError
+    }
   }
 
   Component.onCompleted: refresh()
