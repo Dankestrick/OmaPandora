@@ -106,10 +106,21 @@ def metadata_map(raw):
 def first_artist(meta):
     artists = meta.get("xesam:artist") or []
     if isinstance(artists, str):
-        return artists
+        return clip(artists)
     if artists:
-        return str(artists[0])
+        return clip(artists[0])
     return ""
+
+
+# Everything printed comes from another program, so cap it: status output
+# stays small no matter what Pithos or Pandora sends.
+MAX_TEXT = 512
+MAX_URL = 2048
+MAX_STATIONS = 200
+
+
+def clip(value, limit=MAX_TEXT):
+    return str(value or "")[:limit]
 
 
 def station_id_from_path(path):
@@ -136,8 +147,8 @@ def dump_status(bus, name):
     if isinstance(active, (list, tuple)) and len(active) == 2:
         valid, playlist = active
         if valid and isinstance(playlist, (list, tuple)) and playlist:
-            station_path = str(playlist[0] or "")
-            station_name = str(playlist[1] or "") if len(playlist) > 1 else ""
+            station_path = clip(playlist[0], MAX_URL)
+            station_name = clip(playlist[1]) if len(playlist) > 1 else ""
 
     stations = []
     try:
@@ -146,15 +157,15 @@ def dump_status(bus, name):
             name,
             PLAYLISTS,
             "GetPlaylists",
-            GLib.Variant("(uusb)", (0, 200, "Alphabetical", False)),
+            GLib.Variant("(uusb)", (0, MAX_STATIONS, "Alphabetical", False)),
             GLib.VariantType.new("(a(oss))"),
         )
-        for path, title, _icon in reply.unpack()[0]:
+        for path, title, _icon in reply.unpack()[0][:MAX_STATIONS]:
             stations.append(
                 {
-                    "id": station_id_from_path(path),
-                    "path": str(path),
-                    "name": str(title),
+                    "id": clip(station_id_from_path(path)),
+                    "path": clip(path, MAX_URL),
+                    "name": clip(title),
                 }
             )
     except GLib.Error:
@@ -165,14 +176,14 @@ def dump_status(bus, name):
     position_us = int(player.get("Position") or 0)
     return {
         "connected": True,
-        "bus": name,
-        "identity": str(root.get("Identity") or "Pithos"),
-        "status": str(player.get("PlaybackStatus") or "Stopped"),
-        "title": str(meta.get("xesam:title") or ""),
+        "bus": clip(name),
+        "identity": clip(root.get("Identity") or "Pithos"),
+        "status": clip(player.get("PlaybackStatus") or "Stopped", 32),
+        "title": clip(meta.get("xesam:title")),
         "artist": first_artist(meta),
-        "album": str(meta.get("xesam:album") or ""),
-        "artUrl": str(meta.get("mpris:artUrl") or ""),
-        "trackId": str(meta.get("mpris:trackid") or ""),
+        "album": clip(meta.get("xesam:album")),
+        "artUrl": clip(meta.get("mpris:artUrl"), MAX_URL),
+        "trackId": clip(meta.get("mpris:trackid"), MAX_URL),
         "loved": rating >= 0.99,
         "volume": float(player.get("Volume") or 0),
         "positionMs": int(position_us / 1000),
