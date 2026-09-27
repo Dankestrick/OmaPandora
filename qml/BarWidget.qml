@@ -215,6 +215,7 @@ BarWidget {
 
         Text {
           id: barLabel
+          textFormat: Text.PlainText
           anchors.verticalCenter: parent.verticalCenter
           text: root.barText
           color: button.foreground
@@ -318,6 +319,7 @@ BarWidget {
           anchors.verticalCenter: parent.verticalCenter
 
           Text {
+            textFormat: Text.PlainText
             width: parent.width
             text: "OmaPandora"
             color: root.foreground
@@ -328,6 +330,7 @@ BarWidget {
           }
 
           Text {
+            textFormat: Text.PlainText
             width: parent.width
             text: {
               if (root.pandora && root.pandora.stationName)
@@ -412,6 +415,7 @@ BarWidget {
           }
 
           Text {
+            textFormat: Text.PlainText
             anchors.centerIn: parent
             visible: miniArt.status !== Image.Ready
             text: "󰝚"
@@ -470,6 +474,7 @@ BarWidget {
           }
 
           Text {
+            textFormat: Text.PlainText
             width: parent.width
             visible: root.pandora && (root.pandora.album !== "" || root.pandora.stationName !== "")
             text: root.pandora
@@ -500,6 +505,7 @@ BarWidget {
         Row {
           width: parent.width
           Text {
+            textFormat: Text.PlainText
             text: Api.millisecondsToClock((root.pandora ? root.pandora.positionSeconds : 0) * 1000)
             color: root.muted
             font.family: root.bar ? root.bar.fontFamily : Style.font.family
@@ -507,6 +513,7 @@ BarWidget {
           }
           Item { width: Math.max(0, parent.width - Style.space(80)); height: 1 }
           Text {
+            textFormat: Text.PlainText
             text: Api.millisecondsToClock((root.pandora ? root.pandora.lengthSeconds : 0) * 1000)
             color: root.muted
             font.family: root.bar ? root.bar.fontFamily : Style.font.family
@@ -568,6 +575,7 @@ BarWidget {
         visible: root.pandora && root.pandora.connected
 
         Text {
+          textFormat: Text.PlainText
           anchors.verticalCenter: parent.verticalCenter
           text: root.pandora && root.pandora.volume <= 0.001 ? "󰝟" : "󰕾"
           color: root.pandora && root.pandora.volume <= 0.001 ? root.muted : root.foreground

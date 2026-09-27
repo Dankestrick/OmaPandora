@@ -387,6 +387,7 @@ Item {
                   fontSize: Style.font.icon
                 }
                 Text {
+                  textFormat: Text.PlainText
                   text: "OmaPandora"
                   color: root.foreground
                   font.family: root.fontFamily
@@ -412,6 +413,7 @@ Item {
                   spacing: Style.space(4)
 
                   Text {
+                    textFormat: Text.PlainText
                     text: "My list"
                     color: root.browseTarget === "nowplaying" ? root.accent : root.muted
                     font.family: root.fontFamily
@@ -420,6 +422,7 @@ Item {
                   }
 
                   Text {
+                    textFormat: Text.PlainText
                     width: parent.width
                     visible: root.pinnedStations.length === 0
                     text: "Pin a station with C"
@@ -465,6 +468,7 @@ Item {
                   spacing: Style.space(6)
 
                   Text {
+                    textFormat: Text.PlainText
                     text: "Your stations"
                     color: root.browseTarget === "stations" ? root.accent : root.muted
                     font.family: root.fontFamily
@@ -553,6 +557,7 @@ Item {
                 }
 
                 Text {
+                  textFormat: Text.PlainText
                   width: Math.max(40, parent.width - Style.space(30))
                   anchors.verticalCenter: parent.verticalCenter
                   text: root.pageTitle()
@@ -661,6 +666,7 @@ Item {
                     }
 
                     Text {
+                      textFormat: Text.PlainText
                       anchors.centerIn: parent
                       visible: heroArt.status !== Image.Ready
                       text: "󰎈"
@@ -767,6 +773,7 @@ Item {
                   spacing: Style.space(2)
 
                   Text {
+                    textFormat: Text.PlainText
                     visible: !root.connected
                     width: parent.width
                     text: "Open Pithos and sign in to load your stations."
@@ -938,6 +945,7 @@ Item {
                 }
 
                 Text {
+                  textFormat: Text.PlainText
                   anchors.centerIn: parent
                   visible: footerArtImage.status !== Image.Ready
                   text: "󰎈"
@@ -1048,6 +1056,7 @@ Item {
                   spacing: Style.space(8)
                   visible: root.service && root.service.lengthSeconds > 0
                   Text {
+                    textFormat: Text.PlainText
                     text: Api.millisecondsToClock((root.service ? root.service.positionSeconds : 0) * 1000)
                     color: root.muted
                     font.family: root.fontFamily
@@ -1063,6 +1072,7 @@ Item {
                     enabled: false
                   }
                   Text {
+                    textFormat: Text.PlainText
                     text: Api.millisecondsToClock((root.service ? root.service.lengthSeconds : 0) * 1000)
                     color: root.muted
                     font.family: root.fontFamily
@@ -1084,6 +1094,7 @@ Item {
                 spacing: Style.space(8)
 
                 Text {
+                  textFormat: Text.PlainText
                   anchors.verticalCenter: parent.verticalCenter
                   text: root.service && root.service.volume <= 0.001 ? "󰝟" : "󰕾"
                   color: root.foreground
@@ -1136,6 +1147,7 @@ Item {
             spacing: Style.space(8)
 
             Text {
+              textFormat: Text.PlainText
               text: "Keyboard shortcuts"
               color: root.foreground
               font.family: root.fontFamily
@@ -1158,6 +1170,7 @@ Item {
                 "Esc — Close the player"
               ]
               Text {
+                textFormat: Text.PlainText
                 required property string modelData
                 width: helpColumn.width
                 text: modelData

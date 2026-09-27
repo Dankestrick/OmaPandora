@@ -29,6 +29,7 @@ Button {
 
   Text {
     id: glyph
+    textFormat: Text.PlainText
     anchors.centerIn: parent
     anchors.horizontalCenterOffset: implicitWidth / 2
       - (glyphMetrics.tightBoundingRect.x + root.tightGlyphWidth / 2)
