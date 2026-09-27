@@ -131,13 +131,18 @@ Item {
     playerSurfaces = playerSurfaces.filter(function(item) { return item !== surface })
   }
 
+  // Every helper run gets a time limit so a stuck D-Bus call can't stall the shell.
+  function helperCommand(seconds, args) {
+    return ["timeout", "-k", "5", String(seconds), helper].concat(args)
+  }
+
   function runHelper(args) {
-    helperProc.command = [helper].concat(args)
+    helperProc.command = helperCommand(30, args)
     helperProc.running = true
   }
 
   function refresh() {
-    statusProc.command = [helper, "status"]
+    statusProc.command = helperCommand(15, ["status"])
     statusProc.running = true
   }
 
@@ -302,9 +307,10 @@ Item {
 
   function pinWindowToPreferredScreen() {
     var name = String(preferredScreenName || "")
-    if (!name) return
+    // Monitor names go into a hyprctl batch string; allow only plain names.
+    if (!name || !/^[A-Za-z0-9_.-]+$/.test(name)) return
     pinMonProc.command = [
-      "hyprctl", "--batch",
+      "timeout", "5", "hyprctl", "--batch",
       "dispatch focuswindow title:^(OmaPandora)$; "
         + "dispatch movewindow mon:" + name + "; "
         + "dispatch centerwindow"

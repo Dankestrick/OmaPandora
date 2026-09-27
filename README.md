@@ -160,14 +160,14 @@ pithos or cava, and it does **not** delete your pins.
 
 ```bash
 rm -f ~/.config/omarchy/omapandora-pins.json   # optional
-pkill -f /usr/bin/pithos                        # if it is still running
+gdbus call --session --dest org.mpris.MediaPlayer2.pithos --object-path /org/mpris/MediaPlayer2 --method org.mpris.MediaPlayer2.Quit  # quit Pithos if it is still running
 omarchy pkg drop pithos cava                    # only if nothing else needs them
 ```
 
 From a git checkout you can also run `./scripts/uninstall.sh`, which calls
 the same `omarchy plugin remove`. Details: [docs/uninstall.md](docs/uninstall.md).
 
-## Develop from a clone
+## Development
 
 `scripts/install.sh` copies `manifest.json`, `qml/`, and `helpers/` into the
 live plugin directory. Use it while hacking, not as the public install.

@@ -22,7 +22,8 @@ RATINGS = "org.mpris.MediaPlayer2.ExtensionPithosRatings"
 PROPS = "org.freedesktop.DBus.Properties"
 ROOT = "org.mpris.MediaPlayer2"
 PID_FILE = os.path.join(
-    os.environ.get("XDG_RUNTIME_DIR") or f"/tmp/omapandora-{os.getuid()}",
+    # Owner-only runtime dir; fall back to the user's cache, never shared /tmp.
+    os.environ.get("XDG_RUNTIME_DIR") or os.path.join(os.path.expanduser("~"), ".cache"),
     "omapandora",
     "pithos.pid",
 )

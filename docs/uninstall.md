@@ -29,7 +29,7 @@ rm -f ~/.config/omarchy/omapandora-pins.json
 ## 3. Stop Pithos if it is still running
 
 ```bash
-pkill -f /usr/bin/pithos
+gdbus call --session --dest org.mpris.MediaPlayer2.pithos --object-path /org/mpris/MediaPlayer2 --method org.mpris.MediaPlayer2.Quit
 ```
 
 ## 4. Optional: window rules

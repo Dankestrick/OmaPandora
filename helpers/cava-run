@@ -9,8 +9,10 @@ if [[ -n "$sink" ]]; then
   export PULSE_SOURCE="$monitor"
 fi
 
-conf="$(mktemp /tmp/omapandora-cava.XXXXXX.conf)"
-trap 'rm -f "$conf"' EXIT
+# Private runtime dir (owner-only), not shared /tmp.
+confdir="${XDG_RUNTIME_DIR:-$HOME/.cache}/omapandora"
+mkdir -p -m 700 "$confdir"
+conf="$(mktemp "$confdir/cava.XXXXXX.conf")"
 
 cat >"$conf" <<EOF
 [general]
@@ -40,4 +42,10 @@ gravity = 80
 noise_reduction = 22
 EOF
 
-exec stdbuf -oL cava -p "$conf"
+# Run cava as a child (not exec) so the config file is removed when the
+# visualizer stops, whether cava exits or the shell stops this script.
+stdbuf -oL cava -p "$conf" &
+child=$!
+trap 'kill "$child" 2>/dev/null; rm -f "$conf"' EXIT
+trap 'exit 0' INT TERM HUP
+wait "$child"
